@@ -1,0 +1,51 @@
+{
+	"name": "@wasm-fmt/bindgen",
+	"version": "0.0.0",
+	"description": "Build-time JavaScript bindings generator for wasm-fmt Bridge guests",
+	"author": "magic-akari <akari.ccino@gmail.com>",
+	"keywords": [
+		"formatter",
+		"webassembly",
+		"wasm"
+	],
+	"license": "MIT OR Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/wasm-fmt/bridge.git",
+		"directory": "bindgen"
+	},
+	"homepage": "https://github.com/wasm-fmt/bridge/tree/main/bindgen#readme",
+	"bugs": {
+		"url": "https://github.com/wasm-fmt/bridge/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"engines": {
+		"node": ">=26.10.0"
+	},
+	"type": "module",
+	"types": "./src/index.d.ts",
+	"sideEffects": false,
+	"bin": {
+		"wasm-fmt-bindgen": "src/cli.js"
+	},
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"default": "./src/index.js"
+		}
+	},
+	"dependencies": {
+		"@wasm-fmt/runtime": "0.0.0"
+	},
+	"scripts": {
+		"test": "node --test"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE-MIT",
+		"LICENSE-APACHE"
+	]
+}

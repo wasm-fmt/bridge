@@ -1,0 +1,16 @@
+[package]
+name = "bridge-conformance-rust"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bridge = { package = "wasm-fmt-fdk", path = "../../../crates/wasm-fmt-fdk" }
+
+[features]
+host-formatting = ["bridge/host-formatting"]

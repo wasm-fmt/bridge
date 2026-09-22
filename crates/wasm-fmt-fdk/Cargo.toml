@@ -1,0 +1,21 @@
+[package]
+name = "wasm-fmt-fdk"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Formatter development kit for the wasm-fmt Bridge ABI"
+readme = "README.md"
+keywords = ["formatter", "formatting", "wasm", "webassembly"]
+categories = ["development-tools", "wasm"]
+include = ["src/**", "examples/**", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
+
+[lib]
+name = "bridge"
+
+[features]
+host-formatting = []
+
+[dependencies]
+wasm-fmt-fdk-macros = { version = "=0.0.0", path = "macros" }

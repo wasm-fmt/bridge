@@ -1,0 +1,21 @@
+[package]
+name = "wasm-fmt-fdk-macros"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Procedural macros for the wasm-fmt Rust formatter development kit"
+readme = "README.md"
+keywords = ["formatter", "formatting", "wasm", "webassembly"]
+categories = ["development-tools", "wasm"]
+include = ["src/**", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
+
+[lib]
+name = "wasm_fmt_fdk_macros"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "3.0", features = ["full"] }

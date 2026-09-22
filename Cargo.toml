@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "conformance/guests/rust",
+    "crates/wasm-fmt-fdk",
+    "crates/wasm-fmt-fdk/macros",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.98.1"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/wasm-fmt/bridge"
+version = "0.0.0"

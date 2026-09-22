@@ -1,0 +1,45 @@
+{
+	"name": "@wasm-fmt/runtime",
+	"version": "0.0.0",
+	"description": "JavaScript host runtime for the wasm-fmt Bridge ABI",
+	"author": "magic-akari <akari.ccino@gmail.com>",
+	"keywords": [
+		"formatter",
+		"webassembly",
+		"wasm"
+	],
+	"license": "MIT OR Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/wasm-fmt/bridge.git",
+		"directory": "runtime"
+	},
+	"homepage": "https://github.com/wasm-fmt/bridge/tree/main/runtime#readme",
+	"bugs": {
+		"url": "https://github.com/wasm-fmt/bridge/issues"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"type": "module",
+	"types": "./src/index.d.ts",
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"default": "./src/index.js"
+		}
+	},
+	"scripts": {
+		"test": "node --test"
+	},
+	"files": [
+		"src",
+		"README.md",
+		"LICENSE-MIT",
+		"LICENSE-APACHE"
+	],
+	"engines": {
+		"node": ">=26.10.0"
+	}
+}

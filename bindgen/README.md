@@ -1,0 +1,202 @@
+# `@wasm-fmt/bindgen`
+
+## Installation and support
+
+Requires Node.js **26.10.0** or newer. Version **0.0.0** is an unpublished
+development placeholder. After the first release:
+
+```sh
+npm install --save-dev @wasm-fmt/bindgen
+```
+
+An adapter using the shared runtime must separately declare
+`@wasm-fmt/runtime` as a runtime dependency. Bindgen remains a build-time
+dependency and does not install the adapter's runtime dependencies.
+
+Build-time generator for the JavaScript packaging layer around a Bridge guest.
+It keeps formatter-specific behavior in one adapter while generating the
+mechanical Node, ESM, bundler, Web, and Vite entry points.
+
+```js
+// bridge.bindings.mjs
+import { defineBindings } from "@wasm-fmt/bindgen";
+
+export default defineBindings({
+	name: "sql_fmt",
+	wasm: "target/wasm32-unknown-unknown/release/sql_fmt.wasm",
+	wasmFile: "sql_fmt_bg.wasm",
+	adapter: "bindings/sql_fmt_binding.js",
+	types: {
+		main: "bindings/sql_fmt.d.ts",
+	},
+	assets: ["package.json", "jsr.jsonc", "README.md", "LICENSE", "bindings/sql_fmt_config.d.ts"],
+	outDir: "pkg",
+	clean: true,
+});
+```
+
+Run it after compiling the Wasm guest:
+
+```bash
+wasm-fmt-bindgen
+```
+
+The adapter is the only runtime customization point:
+
+```js
+// @ts-check
+
+/** @typedef {typeof import("./sql_fmt.d.ts")} PublicApi */
+
+/** @type {import("@wasm-fmt/runtime").FormatterAdapter<PublicApi>} */
+const adapter = {
+	create(wasm, host) {
+		const runtime = host.createRuntime(wasm, { encodeConfig });
+
+		/** @type {PublicApi} */
+		const api = {
+			format: runtime.format.bind(runtime),
+			createConfig(config) {
+				return /** @type {import("./sql_fmt.d.ts").ConfigHandle} */ (runtime.createConfig(config ?? {}));
+			},
+			releaseConfig: runtime.releaseConfig.bind(runtime),
+		};
+		return api;
+	},
+};
+
+export default adapter;
+```
+
+The default export must implement `FormatterAdapter<Api>`. Its `create(wasm, host)`
+method returns the formatter's public function API. Bindgen creates a disposable
+Wasm instance during generation, calls `create`, and infers the package exports
+from the returned object's enumerable own properties. Every discovered value
+must be a function with a safe JavaScript export name. The handwritten public
+declarations remain the API contract, while the `FormatterAdapter` and local
+`PublicApi` annotations let a JavaScript type checker verify that the adapter
+implements those declarations. Bindgen itself validates the runtime shape, not
+TypeScript signatures. Keep `// @ts-check` and run `deno check`, `tsc` with
+`checkJs`, or an equivalent checker as part of validation. The adapter type
+lives in the runtime package because generated entries execute the adapter;
+published adapters do not depend on the build-only bindgen package. Public
+declaration modules must expose functions only; bindgen rejects non-function
+runtime API properties.
+
+Generated entry points call `create` again, exactly once for each runtime Wasm
+instance. Because bindgen also calls it synchronously under Node during the
+build, `create` must be Node-safe, synchronous, deterministic in its enumerable
+keys, and free of browser-only globals or external side effects. It should only
+bind the supplied instance and return its API. Build-time discovery is not part
+of the formatter hot path. Returned functions must not depend on the API object
+as their `this` receiver; close over the runtime or bind methods explicitly.
+
+The adapter is copied as one runtime module. Package imports are safe. Relative
+runtime imports must still resolve from the copied adapter's destination and
+their files must be included with `assets`; otherwise keep the adapter
+self-contained. Relative imports used only from JSDoc/types do not affect
+runtime loading.
+
+Configuration is intentionally outside bindgen. An adapter may use JSON, a
+text format, a binary codec, no configuration at all, or expose a completely
+different convenience API.
+
+## Descriptor
+
+- `name`: safe JavaScript identifier used as the generated file prefix.
+- `wasm`: input Wasm guest.
+- `wasmFile`: optional output Wasm filename; defaults to the input basename.
+- `adapter`: module whose default export implements `FormatterAdapter<Api>`.
+- `adapterFile`: optional copied adapter filename.
+- `types.main`: formatter-owned public declaration file.
+- `types.mainFile`: optional copied declaration filename.
+- `outDir`: output directory within the config directory, defaulting to `pkg`.
+- `assets`: copied files/directories, as paths or `{ from, to }` objects.
+- `clean`: remove `outDir` before generation. A clean output must be a strict
+  descendant of the config directory and cannot contain input sources. Output
+  paths may not traverse symbolic links; copied assets may not contain symbolic
+  links. Output filenames use letters, digits, underscores, dots, and hyphens,
+  starting with a letter, digit, or underscore.
+- `targets`: any non-empty subset of `bundler`, `node`, `esm`, `web`, and
+  `vite`; all are generated by default.
+- `initialize`: `"auto"` (the default), `false`, or a Wasm function export
+  name. Auto mode invokes `_initialize` when present.
+
+The generator rejects duplicate output destinations and source/output
+collisions before cleaning or writing files.
+
+Web and Vite entries share a single initialization lifecycle per imported module.
+Concurrent asynchronous calls share the first initialization promise and input.
+`initSync` throws while asynchronous initialization is pending. Failed
+initialization leaves the entry uninitialized and permits a retry; successful
+initialization is never replaced by a later call. Public functions remain
+unavailable until all adapter exports have been validated.
+
+Web `initAsync(input?)` accepts custom inputs. Vite `initAsync()` always uses its
+bundled `?init` loader and rejects arguments; use the Web entry for custom loading.
+Both expose `initSync(moduleOrBuffer)`. Vite has its own `<name>_vite.d.ts`;
+package exports for `./vite` must point to that declaration, not Web's types.
+
+The descriptor and API discovery are evaluated only during the build. Generated
+synchronous entry points export the adapter's function references directly.
+Web and Vite entry points use live bindings that are replaced during
+initialization. There is no descriptor lookup, API-key discovery, `Proxy`,
+rest-argument forwarding, or adapter cache lookup on the formatting hot path.
+
+Bindgen validates that the Wasm module has zero imports or the complete, typed embedded host import group, all Bridge core
+exports, and at least one formatter endpoint. It checks the exact signatures of
+all core exports, formatter endpoints, and the selected initializer before
+writing files. Its binary inspector supports core function/value types and
+rejects GC type declarations and typed references. It also generates the Wasm
+declaration file from actual exports and automatically invokes TinyGo's
+`_initialize` export when present.
+
+## Independent instances and recovery
+
+Every generation also writes `<name>_factory.js` and `<name>_factory.d.ts`.
+This loader-independent entry exports `createFormatter(moduleOrBuffer)`, which
+creates a fresh host, Wasm instance, language initializer, and adapter API on
+every call. It accepts Wasm bytes or a compiled `WebAssembly.Module` and performs
+no file reads or fetches. The returned functions have the formatter's existing
+signatures.
+
+```js
+import { createFormatter } from "./example_factory.js";
+
+const response = await fetch(new URL("./example.wasm", import.meta.url));
+const module = await WebAssembly.compile(await response.arrayBuffer());
+const first = createFormatter(module);
+const second = createFormatter(module);
+
+first.format("source");
+second.format("another source");
+```
+
+Compiled modules can be shared; memories, runtime state, and config handles
+cannot. A trapped instance remains unusable. Explicitly create a replacement
+and recreate its configuration handles; other instances continue to work.
+The ordinary entry points retain their convenient singleton behavior, and
+calling `initSync`/`initAsync` again does not replace a retired singleton.
+Applications needing recovery or multiple instances should use the factory.
+
+Publish both factory files. Packages with explicit export maps should add a
+`./factory` entry pointing to `<name>_factory.js` and its corresponding types.
+Factory imports do not instantiate the default singleton.
+
+## License
+
+Licensed under [MIT](LICENSE-MIT) or [Apache-2.0](LICENSE-APACHE), at your option.
+
+## Embedded host imports
+
+The optional `wasm_fmt_host` group is checked for exact function signatures.
+Every loader owns a host binding and passes it as the second adapter argument;
+adapters create their runtime with `host.createRuntime(wasm, options)`.
+Host-enabled bundler entries use `import source` followed by explicit
+instantiation, like the ESM entry. They require source-phase Wasm import support;
+use Web or Vite entries in toolchains that do not support that syntax. No fetch
+fallback is generated for the bundler target. Import-free bundler entries keep
+their direct Wasm import. Web/Vite initialization retries create fresh bindings.
+
+Bindgen depends on the coordinated runtime version for disposable build-time
+instances. Generated packages also need their normal runtime dependency.

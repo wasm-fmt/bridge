@@ -1,0 +1,16 @@
+[workspace]
+members = [
+    "conflicting-guest-declaration",
+    "multiple-config-types",
+    "undeclared-endpoint-config",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.98.1"
+publish = false
+version = "0.0.0"
+
+[workspace.dependencies]
+bridge = { package = "wasm-fmt-fdk", path = "../.." }

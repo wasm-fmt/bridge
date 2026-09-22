@@ -1,0 +1,40 @@
+[tools]
+go = "1.27.1"
+node = "26.10.0"
+tinygo = "0.42.0"
+
+[tasks.test]
+description = "Run the Bridge unit, binding, and cross-language contract tests"
+run = """
+node scripts/version.mjs --check
+node --test scripts/version.test.mjs
+npm install --ignore-scripts --no-save --package-lock=false --no-audit --no-fund --prefix bindgen ./runtime
+cargo test --locked --workspace
+go test -C fdk-go ./...
+npm test --prefix runtime
+npm test --prefix bindgen
+npm test --prefix conformance
+"""
+
+[tasks.version]
+description = "Synchronize release versions: major, minor, patch, or an explicit version; supports --dry-run"
+run = "node scripts/version.mjs"
+
+[tasks."version:check"]
+description = "Check release versions and Cargo lockfiles are synchronized"
+run = "node scripts/version.mjs --check"
+
+[tasks.check]
+description = "Check Rust formatting and lint all workspace targets"
+run = """
+cargo fmt --all -- --check
+cargo clippy --locked --workspace --all-targets -- -D warnings
+"""
+
+[tasks."package:check"]
+description = "Verify distributable package contents without publishing"
+run = """
+cargo publish --dry-run --locked --all-features -p wasm-fmt-fdk-macros -p wasm-fmt-fdk
+npm pack --dry-run --prefix runtime ./runtime
+npm pack --dry-run --prefix bindgen ./bindgen
+"""
