@@ -60,14 +60,14 @@ checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
 
 [[package]]
 name = "wasm-fmt-fdk"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "wasm-fmt-fdk-macros",
 ]
 
 [[package]]
 name = "wasm-fmt-fdk-macros"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "proc-macro2",
  "quote",
