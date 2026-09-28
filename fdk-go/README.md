@@ -4,7 +4,7 @@
 
 Requires Go **1.27.1** or newer. The validated Wasm compiler is TinyGo
 **0.42.0**, built with `-target=wasm-unknown -gc=conservative`.
-After the first Go module tag is published, install the latest release with:
+Install the latest release with:
 
 ```sh
 go get github.com/wasm-fmt/bridge/fdk-go@latest

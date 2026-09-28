@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.0.1 - 2026-09-29
+
 - Declare Clippy in the Rust toolchain components so checks also run on fresh
   CI runners.
 - Correct the published Rust/npm package status and document Go module
