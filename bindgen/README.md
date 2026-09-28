@@ -2,8 +2,7 @@
 
 ## Installation and support
 
-Requires Node.js **26.10.0** or newer. Version **0.0.0** is an unpublished
-development placeholder. After the first release:
+Requires Node.js **26.10.0** or newer. Install from npm:
 
 ```sh
 npm install --save-dev @wasm-fmt/bindgen

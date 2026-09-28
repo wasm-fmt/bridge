@@ -2,8 +2,8 @@
 
 ## Installation and support
 
-Requires Rust **1.98.1** or newer. Version **0.0.0** is an unpublished development
-placeholder. Formatter authors should use `wasm-fmt-fdk`, which selects the
+Requires Rust **1.98.1** or newer. Formatter authors should use
+`wasm-fmt-fdk`, which selects the
 matching macro version. The generated private FDK interface is not a
 separately supported public API.
 

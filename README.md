@@ -4,8 +4,8 @@ Bridge is the ABI and shared implementation space for wasm-fmt host runtimes and
 
 ## Release status and support
 
-The packages are unpublished and retain the development version **0.0.0**.
-The first release version has not been selected.
+The Rust FDK, macros, JavaScript runtime, and bindgen are published on crates.io
+and npm. Go module releases use tags scoped to the `fdk-go` subdirectory.
 Package versions are separate from the **Bridge ABI v1** wire version.
 See [CHANGELOG.md](CHANGELOG.md) and [RELEASING.md](RELEASING.md).
 

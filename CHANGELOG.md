@@ -2,10 +2,18 @@
 
 ## Unreleased
 
-Packages remain at the unpublished development version `0.0.0`; no first
-release version or date has been selected.
+- Declare Clippy in the Rust toolchain components so checks also run on fresh
+  CI runners.
+- Correct the published Rust/npm package status and document Go module
+  installation and tag naming.
 
-Prepared functionality for the initial release of Bridge ABI v1:
+## 0.0.0 - 2026-09-28
+
+Initial publication of the Rust FDK, macros, JavaScript runtime, and bindgen.
+The Go FDK source is included in the repository, but no Go module version tag
+was published for this release.
+
+Bridge ABI v1 functionality:
 
 - Rust FDK and procedural macros with typed, borrowed registered configurations.
 - Go FDK for TinyGo Wasm guests with explicit configuration and range capabilities.

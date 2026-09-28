@@ -4,13 +4,14 @@
 
 Requires Go **1.27.1** or newer. The validated Wasm compiler is TinyGo
 **0.42.0**, built with `-target=wasm-unknown -gc=conservative`.
-Version **0.0.0** is an unpublished development placeholder. After the first release:
+After the first Go module tag is published, install the latest release with:
 
 ```sh
 go get github.com/wasm-fmt/bridge/fdk-go@latest
 ```
 
-This subdirectory module is released with the Git tag `fdk-go/vX.Y.Z`.
+This subdirectory module is released with the Git tag `fdk-go/vX.Y.Z`;
+consumers use `@vX.Y.Z` in `go get`, without the tag's `fdk-go/` prefix.
 
 Go formatter development kit for the wasm-fmt Bridge ABI.
 

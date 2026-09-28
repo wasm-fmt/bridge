@@ -3,15 +3,14 @@
 ## Installation and support
 
 Requires Rust **1.98.1** or newer. The crate uses edition 2024.
-After the first release, add the FDK with:
+Add the FDK from crates.io:
 
 ```sh
 cargo add wasm-fmt-fdk --rename bridge
 ```
 
 The FDK re-exports its matching macro crate; consumers do not need a separate
-macro dependency. The current version `0.0.0` is an unpublished development
-placeholder; the first release version has not been selected.
+macro dependency.
 
 The Rust FDK exports ordinary Rust functions through the Bridge ABI.
 
