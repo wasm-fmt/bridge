@@ -1,6 +1,6 @@
 {
 	"name": "@wasm-fmt/bindgen",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Build-time JavaScript bindings generator for wasm-fmt Bridge guests",
 	"author": "magic-akari <akari.ccino@gmail.com>",
 	"keywords": [
@@ -37,7 +37,7 @@
 		}
 	},
 	"dependencies": {
-		"@wasm-fmt/runtime": "0.0.1"
+		"@wasm-fmt/runtime": "0.1.0"
 	},
 	"scripts": {
 		"test": "node --test"
